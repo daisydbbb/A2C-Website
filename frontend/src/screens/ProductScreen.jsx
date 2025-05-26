@@ -3,81 +3,99 @@ import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Row, Col, Image, ListGroup, Card, Button } from "react-bootstrap";
 import Rating from "../components/Rating";
-import axios from "axios";
+// import axios from "axios";
 import { useState, useEffect } from "react";
+import { useGetProductDetailsQuery } from "../slices/productsApiSlice";
+import Loader from "../components/Loader";
+import Message from "../components/Message";
 
 const ProductScreen = () => {
   const { id: productId } = useParams();
-  const [product, setProduct] = useState({});
+  // const [product, setProduct] = useState({});
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      const { data } = await axios.get(`/api/products/${productId}`);
-      setProduct(data);
-    };
-    fetchProduct();
-  }, [productId]);
+  // useEffect(() => {
+  //   const fetchProduct = async () => {
+  //     const { data } = await axios.get(`/api/products/${productId}`);
+  //     setProduct(data);
+  //   };
+  //   fetchProduct();
+  // }, [productId]);
+
+  const {
+    data: product,
+    isLoading,
+    isError,
+    error,
+  } = useGetProductDetailsQuery(productId);
 
   return (
     <>
       <Link className="btn btn-light my-3" to="/">
         Go Back
       </Link>
-      <Row>
-        <Col md={5} className="d-flex align-items-center">
-          <Image
-            className="product-img"
-            src={product.image}
-            alt={product.name}
-            fluid
-          />
-        </Col>
+      {isLoading ? (
+        <Loader />
+      ) : isError ? (
+        <Message variant="danger">
+          {error?.data?.message || error.error}
+        </Message>
+      ) : (
+        // render components after loaded, otherwise product might still be undefined while the api is still fetching
+        <Row>
+          <Col md={5} className="d-flex align-items-center">
+            <Image
+              className="product-img"
+              src={product.image}
+              alt={product.name}
+              fluid
+            />
+          </Col>
 
-        <Col md={7}>
-          <ListGroup variant="flush">
-            <ListGroup.Item>
-              <h1>{product.name}</h1>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Row>
-                <Col>
-                  <h3>${product.price}</h3>
-                </Col>
-              </Row>
-              <Row>
-                <Col>{product.countInStock > 0 ? "" : "Sold Out"}</Col>
-              </Row>
-            </ListGroup.Item>
+          <Col md={7}>
+            <ListGroup variant="flush">
+              <ListGroup.Item>
+                <h1>{product.name}</h1>
+              </ListGroup.Item>
+              <ListGroup.Item>
+                <Row>
+                  <Col>
+                    <h3>${product.price}</h3>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>{product.countInStock > 0 ? "" : "Sold Out"}</Col>
+                </Row>
+              </ListGroup.Item>
 
-            <ListGroup.Item>
-              <h3>Product Details</h3>
-              <p>{product.description}</p>
-            </ListGroup.Item>
+              <ListGroup.Item>
+                <h3>Product Details</h3>
+                <p>{product.description}</p>
+              </ListGroup.Item>
 
-            <ListGroup.Item>
-              <h3>Configuration</h3>
-              <p>{product.configuration}</p>
-            </ListGroup.Item>
+              <ListGroup.Item>
+                <h3>Configuration</h3>
+                <p>{product.configuration}</p>
+              </ListGroup.Item>
 
-            {/* <ListGroup.Item>
+              {/* <ListGroup.Item>
               <Rating
                 value={product.rating}
                 text={`${product.numReviews} reviews`}
               />
             </ListGroup.Item> */}
 
-            <ListGroup.Item>
-              <Button
-                className="btn-block"
-                type="button"
-                disabled={product.countInStock === 0}
-              >
-                Add to Cart
-              </Button>
-            </ListGroup.Item>
-          </ListGroup>
-        </Col>
-        {/* <Col md={3}>
+              <ListGroup.Item>
+                <Button
+                  className="btn-block"
+                  type="button"
+                  disabled={product.countInStock === 0}
+                >
+                  Add to Cart
+                </Button>
+              </ListGroup.Item>
+            </ListGroup>
+          </Col>
+          {/* <Col md={3}>
           <Card>
             <ListGroup variant="flush">
               <ListGroup.Item>
@@ -110,7 +128,8 @@ const ProductScreen = () => {
             </ListGroup>
           </Card>
         </Col> */}
-      </Row>
+        </Row>
+      )}
     </>
   );
 };

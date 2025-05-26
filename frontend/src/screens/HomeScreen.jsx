@@ -2,29 +2,45 @@ import React from "react";
 import { Row, Col } from "react-bootstrap";
 import Product from "../components/Product";
 import { useEffect, useState } from "react";
-import axios from "axios"; // prefer axios over native fetch api
+// import axios from "axios"; // preferaxios over native fetch api
+import { useGetProductsQuery } from "../slices/productsApiSlice"; // prefer RTK Query over axios (redux toolkit)
+import Loader from "../components/Loader";
+import Message from "../components/Message";
 
 const HomeScreen = () => {
-  const [products, setProducts] = useState([]);
+  // --- Use axios to fetch products ---
+  // const [products, setProducts] = useState([]);
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     const { data } = await axios.get("/api/products"); // we are using proxy, so no need for http://localhost:5001
+  //     setProducts(data);
+  //   };
+  //   fetchProducts();
+  // }, []);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const { data } = await axios.get("/api/products"); // we are using proxy, so no need for http://localhost:5001
-      setProducts(data);
-    };
-    fetchProducts();
-  }, []);
+  // --- Use redux toolkit to fetch products ---
+  const { data: products, isLoading, isError, error } = useGetProductsQuery();
 
   return (
     <>
-      <h1>Latest Products</h1>
-      <Row>
-        {products.map((product) => (
-          <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
-            <Product product={product} />
-          </Col>
-        ))}
-      </Row>
+      {isLoading ? (
+        <Loader />
+      ) : isError ? (
+        <Message variant="danger">
+          {error?.data?.message || error.error}
+        </Message>
+      ) : (
+        <>
+          <h1>Latest Products</h1>
+          <Row>
+            {products.map((product) => (
+              <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
+                <Product product={product} />
+              </Col>
+            ))}
+          </Row>
+        </>
+      )}
     </>
   );
 };
