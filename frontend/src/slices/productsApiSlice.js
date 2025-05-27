@@ -18,5 +18,8 @@ export const productsApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetProductsQuery, useGetProductDetailsQuery } =
+export const {
+  useGetProductsQuery,
+  useGetProductDetailsQuery,
+} = //useXXXQuery is the hook that allows us to use the query
   productsApiSlice;

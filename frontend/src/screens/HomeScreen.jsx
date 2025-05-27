@@ -1,7 +1,6 @@
 import React from "react";
 import { Row, Col } from "react-bootstrap";
 import Product from "../components/Product";
-import { useEffect, useState } from "react";
 // import axios from "axios"; // preferaxios over native fetch api
 import { useGetProductsQuery } from "../slices/productsApiSlice"; // prefer RTK Query over axios (redux toolkit)
 import Loader from "../components/Loader";
