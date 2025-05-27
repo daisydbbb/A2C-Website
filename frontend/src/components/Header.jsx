@@ -3,8 +3,11 @@ import { Navbar, Nav, Container } from "react-bootstrap";
 import { FaShoppingCart, FaUser, FaChild } from "react-icons/fa";
 import logo from "../assets/logo.png";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Header = () => {
+  const { cartItems } = useSelector((state) => state.cart);
+
   return (
     <header>
       <Navbar bg="dark" variant="dark" expand="md" collapseOnSelect>
@@ -27,6 +30,11 @@ const Header = () => {
               </Nav.Link>
               <Nav.Link as={Link} to="/cart">
                 <FaShoppingCart /> Cart
+                {cartItems.length > 0 && (
+                  <span className="ms-1">
+                    ({cartItems.reduce((acc, item) => acc + item.qty, 0)})
+                  </span>
+                )}
               </Nav.Link>
               <Nav.Link as={Link} to="/login">
                 <FaUser /> Sign In
