@@ -7,6 +7,7 @@ import productRoutes from "./routes/productRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import userRoutes from "./routes/userRoutes.js";
 import cookieParser from "cookie-parser";
+import orderRoutes from "./routes/orderRoutes.js";
 
 connectDB();
 
@@ -26,6 +27,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/products", productRoutes); //http://localhost:5001/api/products
 app.use("/api/users", userRoutes);
+app.use("/api/orders", orderRoutes);
 
 // error handling middleware must be under all the routes
 app.use(notFound);

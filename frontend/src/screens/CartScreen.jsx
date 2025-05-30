@@ -38,7 +38,7 @@ const CartScreen = () => {
   };
 
   const checkoutHandler = () => {
-    navigate("/login?redirect=/shipping");
+    navigate("/shipping");
   };
 
   return (
@@ -150,7 +150,7 @@ const CartScreen = () => {
                 type="button"
                 variant="primary"
                 disabled={cartItems.length === 0}
-                onClick={() => navigate("/login?redirect=shipping")}
+                onClick={() => navigate("/login?redirect=/shipping")}
               >
                 PayPal
               </Button>
