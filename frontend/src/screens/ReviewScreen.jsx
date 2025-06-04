@@ -157,7 +157,9 @@ const ReviewScreen = () => {
               <ListGroup.Item>
                 <Row>
                   <Col>Items:</Col>
-                  <Col>${itemsPrice}</Col>
+                  <Col>
+                    {cartItems.reduce((acc, item) => acc + item.qty, 0)}
+                  </Col>
                 </Row>
                 <Row>
                   <Col>Subtotal:</Col>

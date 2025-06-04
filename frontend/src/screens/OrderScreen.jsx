@@ -1,14 +1,22 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useGetOrderDetailsQuery } from "../slices/ordersApiSlice";
 import { useNavigate } from "react-router-dom";
-import { Row, Col, ListGroup, Card, Button } from "react-bootstrap";
+import { Row, Col, ListGroup, Card, Button, Image } from "react-bootstrap";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
+import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
+import {
+  usePayOrderMutation,
+  useGetPaypalClientIdQuery,
+  useGetOrderDetailsQuery,
+} from "../slices/ordersApiSlice";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const OrderScreen = () => {
   const navigate = useNavigate();
 
+  // order details
   const { id: orderId } = useParams();
   const {
     data: order,
@@ -17,19 +25,49 @@ const OrderScreen = () => {
     error,
   } = useGetOrderDetailsQuery(orderId);
 
+  // paypal
+  const [payOrder, { isLoading: loadingPay }] = usePayOrderMutation();
+  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
+  const { userInfo } = useSelector((state) => state.auth);
+  const {
+    data: paypal,
+    isLoading: loadingPaypal,
+    error: errorPaypal,
+  } = useGetPaypalClientIdQuery();
+
+  useEffect(() => {
+    if (!errorPaypal && !loadingPaypal && paypal.clientId) {
+      const loadPaypalScript = async () => {
+        paypalDispatch({
+          type: "resetOptions",
+          value: {
+            "client-id": paypal.clientId,
+            currency: "USD",
+          },
+        });
+        paypalDispatch({
+          type: "setLoadingStatus",
+          value: "pending",
+        });
+      };
+      if (order && !order.isPaid && !window.paypal) {
+        loadPaypalScript();
+      }
+    }
+  }, [order, paypal, paypalDispatch, errorPaypal, loadingPaypal]);
+
   if (!order) {
     return <div>Order not found</div>;
   }
-
   if (isLoading) {
     return <Loader />;
   }
-
   if (error) {
     return <Message variant="danger">{error}</Message>;
   }
 
   const {
+    orderItems,
     shippingAddress,
     billingAddress,
     paymentMethod,
@@ -38,7 +76,44 @@ const OrderScreen = () => {
     shippingPrice,
     totalPrice,
   } = order;
-  console.log(order);
+
+  // ---- paypal functions ----
+  const onApprove = async (data, actions) => {
+    return actions.order.capture().then(async (details) => {
+      try {
+        await payOrder({ orderId, details }).unwrap();
+        toast.success("Payment successful");
+        refetch();
+      } catch (err) {
+        toast.error(err?.data?.message || err.error);
+      }
+    });
+  };
+
+  const onError = (error) => {
+    toast.error(error.message);
+  };
+
+  const onApproveTest = async () => {
+    await payOrder({ orderId, details: { payer: {} } }).unwrap();
+    toast.success("Payment successful");
+    refetch();
+  };
+
+  const createOrder = (data, actions) => {
+    return actions.order
+      .create({
+        purchase_units: [
+          {
+            amount: { value: totalPrice },
+          },
+        ],
+      })
+      .then((orderId) => {
+        return orderId;
+      });
+  };
+  // ---------------
 
   return (
     <div className="container mt-3">
@@ -70,22 +145,49 @@ const OrderScreen = () => {
               )}
             </ListGroup.Item>
             <ListGroup.Item>
-              <h2>Billing Address</h2>
-              <p>
-                {billingAddress.firstName} {billingAddress.lastName}
-                <br />
-                {billingAddress.phone}
-                <br />
-                {billingAddress.address}
-                <br />
-                {billingAddress.city}, {billingAddress.postalCode}
-                <br />
-              </p>
+              <h2>Billing Information</h2>
+              <Row>
+                <Col md={6}>
+                  <p>
+                    {billingAddress.firstName} {billingAddress.lastName}
+                    <br />
+                    {billingAddress.phone}
+                    <br />
+                    {billingAddress.email}
+                    <br />
+                    {billingAddress.address}
+                    <br />
+                    {billingAddress.city}, {billingAddress.postalCode}
+                    <br />
+                    {billingAddress.country}
+                    <br />
+                  </p>
+                </Col>
+                <Col md={6}>{paymentMethod}</Col>
+              </Row>
               {order.isPaid ? (
-                <Message variant="success">Paid</Message>
+                <Message variant="success">
+                  Paid on {order.paidAt.substring(0, 10)}
+                </Message>
               ) : (
                 <Message>Not Paid</Message>
               )}
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <h2>Ordered Items</h2>
+              {orderItems.map((item) => (
+                <ListGroup.Item key={item._id}>
+                  <Row>
+                    <Col md={1}>
+                      <Image src={item.image} alt={item.name} fluid rounded />
+                    </Col>
+                    <Col md={6}>{item.name}</Col>
+                    <Col md={1}>{item.qty}</Col>
+                    <Col md={2}>${item.price}</Col>
+                    <Col md={1}>${item.price * item.qty}</Col>
+                  </Row>
+                </ListGroup.Item>
+              ))}
             </ListGroup.Item>
           </ListGroup>
           <Button
@@ -105,7 +207,9 @@ const OrderScreen = () => {
               <ListGroup.Item>
                 <Row>
                   <Col>Items:</Col>
-                  <Col>$ {itemsPrice}</Col>
+                  <Col>
+                    {orderItems.reduce((acc, item) => acc + item.qty, 0)}
+                  </Col>
                 </Row>
                 <Row>
                   <Col>Subtotal:</Col>
@@ -126,7 +230,28 @@ const OrderScreen = () => {
                   </Col>
                 </Row>
               </ListGroup.Item>
-              {/* Pay order placeholder*/}
+              {!order.isPaid && !isPending && (
+                <ListGroup.Item>
+                  {loadingPay && <Loader />}
+                  {isPending ? (
+                    <Loader />
+                  ) : (
+                    <div>
+                      {/* <Button
+                        onClick={onApproveTest}
+                        style={{ marginBottom: "10px" }}
+                      >
+                        Test Pay Order
+                      </Button> */}
+                      <PayPalButtons
+                        createOrder={createOrder}
+                        onApprove={onApprove}
+                        onError={onError}
+                      />
+                    </div>
+                  )}
+                </ListGroup.Item>
+              )}
               {/* Mark as delivered placeholder*/}
             </ListGroup>
           </Card>

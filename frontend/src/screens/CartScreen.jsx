@@ -143,16 +143,7 @@ const CartScreen = () => {
                 disabled={cartItems.length === 0}
                 onClick={checkoutHandler}
               >
-                Check Out
-              </Button>
-              <Button
-                className="btn-block"
-                type="button"
-                variant="primary"
-                disabled={cartItems.length === 0}
-                onClick={() => navigate("/login?redirect=/shipping")}
-              >
-                PayPal
+                Proceed to Check Out
               </Button>
             </ListGroup.Item>
           </ListGroup>

@@ -47,7 +47,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
 // @access Private
 const getMyOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({ user: req.user._id });
-  res.json(orders);
+  res.status(200).json(orders);
 });
 
 // @desc   Get order by ID
@@ -84,7 +84,7 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
     email_address: req.body.payer.email_address,
   };
   const updatedOrder = await order.save();
-  res.json(updatedOrder);
+  res.status(200).json(updatedOrder);
 });
 
 // @desc   Update order to delivered
@@ -99,7 +99,7 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
   order.isDelivered = true;
   order.deliveredAt = Date.now();
   const updatedOrder = await order.save();
-  res.json(updatedOrder);
+  res.status(200).json(updatedOrder);
 });
 
 // @desc   Get all orders
@@ -107,7 +107,7 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
 // @access Private/Admin
 const getOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({}).populate("user", "id name");
-  res.json(orders);
+  res.status(200).json(orders);
 });
 
 export {

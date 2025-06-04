@@ -16,6 +16,7 @@ const ShippingScreen = () => {
   const [firstName, setFirstName] = useState(shippingAddress?.firstName || "");
   const [lastName, setLastName] = useState(shippingAddress?.lastName || "");
   const [phone, setPhone] = useState(shippingAddress?.phone || "");
+  const [email, setEmail] = useState(shippingAddress?.email || "");
   const [address, setAddress] = useState(shippingAddress?.address || "");
   const [city, setCity] = useState(shippingAddress?.city || "");
   const [postalCode, setPostalCode] = useState(
@@ -30,6 +31,7 @@ const ShippingScreen = () => {
         firstName,
         lastName,
         phone,
+        email,
         address,
         city,
         postalCode,
@@ -76,6 +78,15 @@ const ShippingScreen = () => {
               placeholder="Enter phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+            ></Form.Control>
+          </Form.Group>
+          <Form.Group controlId="email" className="my-2">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              placeholder="Enter email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             ></Form.Control>
           </Form.Group>
           <Form.Group controlId="address" className="my-2">

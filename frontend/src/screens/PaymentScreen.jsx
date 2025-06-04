@@ -127,7 +127,7 @@ const PaymentScreen = () => {
                     <Form.Control
                       type="text"
                       name="cardName"
-                      placeholder="Smith White"
+                      placeholder="John Doe"
                       value={cardDetails.cardName}
                       onChange={handleCardInputChange}
                     />

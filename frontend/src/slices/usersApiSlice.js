@@ -14,6 +14,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       query: () => ({
         url: `${USERS_URL}/logout`,
         method: "POST",
+        // request dont neet to send any  data, so no need to send body:data
       }),
     }),
     register: builder.mutation({
@@ -23,11 +24,22 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    profile: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/profile`,
+        method: "PUT",
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useLogoutMutation, useRegisterMutation } =
-  usersApiSlice; //useXXXMutation hook
+export const {
+  useLoginMutation,
+  useLogoutMutation,
+  useRegisterMutation,
+  useProfileMutation,
+} = usersApiSlice; //useXXXMutation hook
 
 // builder.query -> GET
 // builder.mutation -> POST, PUT, DELETEs
