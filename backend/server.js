@@ -1,3 +1,4 @@
+import path from "path";
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config(); // Load environment variables from .env file
@@ -8,6 +9,7 @@ import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import userRoutes from "./routes/userRoutes.js";
 import cookieParser from "cookie-parser";
 import orderRoutes from "./routes/orderRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 
 connectDB();
 
@@ -32,6 +34,11 @@ app.use("/api/orders", orderRoutes);
 app.get("/api/config/paypal", (req, res) => {
   res.send({ clientId: process.env.PAYPAL_CLIENT_ID });
 });
+// image upload route
+app.use("/api/upload", uploadRoutes);
+
+const __dirname = path.resolve(); // set __dirname to the root directory
+app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
 // error handling middleware must be under all the routes
 app.use(notFound);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, ListGroup, Card, Button, Image } from "react-bootstrap";
@@ -9,6 +9,7 @@ import {
   usePayOrderMutation,
   useGetPaypalClientIdQuery,
   useGetOrderDetailsQuery,
+  useDeliverOrderMutation,
 } from "../slices/ordersApiSlice";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
@@ -24,6 +25,10 @@ const OrderScreen = () => {
     isLoading,
     error,
   } = useGetOrderDetailsQuery(orderId);
+
+  // deliver order
+  const [deliverOrder, { isLoading: loadingDeliver }] =
+    useDeliverOrderMutation();
 
   // paypal
   const [payOrder, { isLoading: loadingPay }] = usePayOrderMutation();
@@ -94,11 +99,11 @@ const OrderScreen = () => {
     toast.error(error.message);
   };
 
-  const onApproveTest = async () => {
-    await payOrder({ orderId, details: { payer: {} } }).unwrap();
-    toast.success("Payment successful");
-    refetch();
-  };
+  // const onApproveTest = async () => {
+  //   await payOrder({ orderId, details: { payer: {} } }).unwrap();
+  //   toast.success("Payment successful");
+  //   refetch();
+  // };
 
   const createOrder = (data, actions) => {
     return actions.order
@@ -114,6 +119,16 @@ const OrderScreen = () => {
       });
   };
   // ---------------
+
+  const deliverHandler = async (orderId) => {
+    try {
+      await deliverOrder(orderId).unwrap();
+      toast.success("Order delivered");
+      refetch();
+    } catch (err) {
+      toast.error(err?.data?.message || err.error);
+    }
+  };
 
   return (
     <div className="container mt-3">
@@ -139,7 +154,9 @@ const OrderScreen = () => {
               </p>
 
               {order.isDelivered ? (
-                <Message variant="success">Delivered</Message>
+                <Message variant="success">
+                  Delivered on {order.deliveredAt.substring(0, 10)}
+                </Message>
               ) : (
                 <Message>Not Delivered</Message>
               )}
@@ -252,7 +269,21 @@ const OrderScreen = () => {
                   )}
                 </ListGroup.Item>
               )}
-              {/* Mark as delivered placeholder*/}
+
+              {loadingDeliver && <Loader />}
+              {userInfo &&
+                userInfo.isAdmin &&
+                order.isPaid &&
+                !order.isDelivered && (
+                  <ListGroup.Item>
+                    <Button
+                      variant="primary"
+                      onClick={() => deliverHandler(order._id)}
+                    >
+                      Mark as Delivered
+                    </Button>
+                  </ListGroup.Item>
+                )}
             </ListGroup>
           </Card>
         </Col>

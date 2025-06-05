@@ -1,18 +1,14 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { Table, Button } from "react-bootstrap";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import { toast } from "react-toastify";
-import { useParams } from "react-router-dom";
-import { LinkContainer } from "react-router-bootstrap";
 import Loader from "../../components/Loader";
 import Message from "../../components/Message";
 import { useGetOrdersQuery } from "../../slices/ordersApiSlice";
 import { FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const OrderListScreen = () => {
   const { data: orders, isLoading, error } = useGetOrdersQuery();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -22,7 +18,7 @@ const OrderListScreen = () => {
       ) : error ? (
         <Message variant="danger">{error}</Message>
       ) : (
-        <Table striped hover responsive className="table-sm">
+        <Table hover responsive className="table-sm">
           <thead>
             <tr>
               <th>Order Number</th>
@@ -31,12 +27,15 @@ const OrderListScreen = () => {
               <th>Total Price</th>
               <th>Payment Status</th>
               <th>Delivery Status</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr key={order._id}>
+              <tr
+                key={order._id}
+                onClick={() => navigate(`/order/${order._id}`)}
+                style={{ cursor: "pointer" }}
+              >
                 <td>
                   <Link to={`/order/${order._id}`}>{order._id}</Link>
                 </td>
@@ -56,11 +55,6 @@ const OrderListScreen = () => {
                   ) : (
                     <FaTimes style={{ color: "red" }} />
                   )}
-                </td>
-                <td>
-                  <Button variant="light" className="btn-sm">
-                    Edit
-                  </Button>
                 </td>
               </tr>
             ))}

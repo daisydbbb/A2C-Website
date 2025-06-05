@@ -10,7 +10,6 @@ const products = [
     countInStock: 10,
     rating: 4.5,
     numReviews: 12,
-    configuration: "Airpods Wireless Bluetooth Headphones",
   },
   {
     name: "iPhone 11 Pro 256GB Memory",
@@ -23,7 +22,6 @@ const products = [
     countInStock: 0,
     rating: 4.0,
     numReviews: 8,
-    configuration: "iPhone 11 Pro 256GB Memory",
   },
   {
     name: "Camera",
@@ -36,7 +34,6 @@ const products = [
     countInStock: 5,
     rating: 3,
     numReviews: 12,
-    configuration: "Camera",
   },
   {
     name: "Playstation 4 Pro White Version",
@@ -49,7 +46,6 @@ const products = [
     countInStock: 11,
     rating: 5,
     numReviews: 12,
-    configuration: "Playstation 4 Pro White Version",
   },
 ];
 
