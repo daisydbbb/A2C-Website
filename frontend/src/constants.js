@@ -1,5 +1,5 @@
 // export const BASE_URL =
-//   process.env.NODE_ENV === "development" ? "http://localhost:5001" : "";
+//   process.env.NODE_ENV === "development" ? "http://localhost:5003" : "";
 
 export const BASE_URL = ""; // because we are using proxy
 export const PRODUCTS_URL = "/api/products";

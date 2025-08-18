@@ -4,30 +4,27 @@ import { Table, Button, Image, Row, Col } from "react-bootstrap";
 import { FaTrash, FaPlus } from "react-icons/fa";
 import Loader from "../../components/Loader";
 import Message from "../../components/Message";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useCreateProductMutation } from "../../slices/productsApiSlice";
 import { toast } from "react-toastify";
+import Paginate from "../../components/Paginate";
 
 const ProductListScreen = () => {
   const navigate = useNavigate();
-  const { data: products, isLoading, error, refetch } = useGetProductsQuery();
+  const params = useParams();
+  const pageNumber = params.pageNumber || 1;
+  const { data, isLoading, error, refetch } = useGetProductsQuery({
+    pageNumber,
+  });
   const [createProduct, { isLoading: loadingCreate }] =
     useCreateProductMutation();
-
-  const deleteHandler = (e, id) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (window.confirm("Are you sure?")) {
-      console.log("delete");
-    }
-  };
 
   const createProductHandler = async () => {
     if (window.confirm("Are you sure to create a new product?")) {
       try {
-        await createProduct().unwrap();
+        const result = await createProduct().unwrap();
         toast.success("Product created successfully");
-        refetch();
+        navigate(`/admin/product/${result._id}/edit`);
       } catch (err) {
         toast.error(err?.data?.message || err.error);
       }
@@ -68,7 +65,7 @@ const ProductListScreen = () => {
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
+              {data.products.map((product) => (
                 <tr
                   key={product._id}
                   onClick={() => navigate(`/admin/product/${product._id}/edit`)}
@@ -126,6 +123,12 @@ const ProductListScreen = () => {
               ))}
             </tbody>
           </Table>
+          <Paginate
+            pages={data.pages}
+            page={data.page}
+            isAdmin={true}
+            keyword={""}
+          />
         </>
       )}
     </>

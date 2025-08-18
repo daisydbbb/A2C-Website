@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 import { FaShoppingCart, FaUser, FaChild } from "react-icons/fa";
+import SearchBox from "./SearchBox";
 import logo from "../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../slices/usersApiSlice";
@@ -42,9 +43,11 @@ const Header = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
-              <Nav.Link as={Link} to="/about">
+              <SearchBox />
+              <Nav.Link as={Link} to="/aboutus">
                 <FaChild /> About Us
               </Nav.Link>
+
               <Nav.Link as={Link} to="/cart">
                 <FaShoppingCart /> Cart
                 {cartItems.length > 0 && (

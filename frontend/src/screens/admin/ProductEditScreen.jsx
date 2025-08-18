@@ -4,6 +4,7 @@ import { Form, Button } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import {
+  useDeleteProductMutation,
   useGetProductDetailsQuery,
   useUpdateProductMutation,
 } from "../../slices/productsApiSlice";
@@ -26,8 +27,10 @@ const ProductEditScreen = () => {
   const [updateProduct, { isLoading: loadingUpdate }] =
     useUpdateProductMutation();
 
-  const [uploadProductImage, { isLoading: loadingUpload }] =
-    useUploadProductImageMutation();
+  const [uploadProductImage] = useUploadProductImageMutation();
+
+  const [deleteProduct, { isLoading: loadingDelete }] =
+    useDeleteProductMutation();
 
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
@@ -85,6 +88,18 @@ const ProductEditScreen = () => {
     }
   };
 
+  const deleteProductHandler = async (productId) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        await deleteProduct(productId);
+        toast.success("Product deleted successfully");
+        navigate("/admin/productlist");
+      } catch (err) {
+        toast.error(err?.data?.message || err.error);
+      }
+    }
+  };
+
   return (
     <>
       <Link to="/admin/productlist">
@@ -95,6 +110,7 @@ const ProductEditScreen = () => {
       <FormContainer>
         <h1>Product Information</h1>
         {loadingUpdate && <Loader />}
+        {loadingDelete && <Loader />}
         {isLoading ? (
           <Loader />
         ) : error ? (
@@ -116,7 +132,7 @@ const ProductEditScreen = () => {
                 type="number"
                 placeholder="Enter price"
                 value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                onChange={(e) => setPrice(Number(e.target.value))}
                 min={0}
               ></Form.Control>
             </Form.Group>
@@ -162,7 +178,7 @@ const ProductEditScreen = () => {
                 type="number"
                 placeholder="Enter count in stock"
                 value={countInStock}
-                onChange={(e) => setCountInStock(e.target.value)}
+                onChange={(e) => setCountInStock(Number(e.target.value))}
                 min={0}
               ></Form.Control>
             </Form.Group>
@@ -179,6 +195,13 @@ const ProductEditScreen = () => {
             </Form.Group>
             <Button type="submit" variant="primary" className="mt-3">
               Update
+            </Button>
+            <Button
+              variant="danger"
+              className="mt-3"
+              onClick={() => deleteProductHandler(productId)}
+            >
+              Delete Product
             </Button>
           </Form>
         )}

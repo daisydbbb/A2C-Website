@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Table, Button, Form, Row, Col } from "react-bootstrap";
-import { LinkContainer } from "react-router-bootstrap";
 import { useProfileMutation } from "../slices/usersApiSlice";
 import { useGetMyOrdersQuery } from "../slices/ordersApiSlice";
 import { toast } from "react-toastify";
@@ -12,7 +11,6 @@ import { setCredentials } from "../slices/authSlice";
 import { FaTimes } from "react-icons/fa";
 
 const ProfileScreen = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [name, setName] = useState("");
