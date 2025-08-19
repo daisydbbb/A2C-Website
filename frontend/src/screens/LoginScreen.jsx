@@ -1,8 +1,8 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import FormContainer from "../components/FormContainer";
 import Loader from "../components/Loader";
@@ -17,16 +17,9 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [login, { isLoading }] = useLoginMutation();
 
-  const { userInfo } = useSelector((state) => state.auth);
   const { search } = useLocation();
   const sp = new URLSearchParams(search); // search parameter
   const redirect = sp.get("redirect") || "/"; // in CartScreen, when check out, /login?redirect=/shipping
-
-  // useEffect(() => {
-  //   if (userInfo) {
-  //     navigate(redirect);
-  //   }
-  // }, [userInfo, navigate, redirect]);
 
   const submitHandler = async (e) => {
     e.preventDefault();

@@ -1,7 +1,7 @@
 import React from "react";
 import { useGetProductsQuery } from "../../slices/productsApiSlice";
 import { Table, Button, Image, Row, Col } from "react-bootstrap";
-import { FaTrash, FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import Loader from "../../components/Loader";
 import Message from "../../components/Message";
 import { useNavigate, useParams } from "react-router-dom";
@@ -13,7 +13,7 @@ const ProductListScreen = () => {
   const navigate = useNavigate();
   const params = useParams();
   const pageNumber = params.pageNumber || 1;
-  const { data, isLoading, error, refetch } = useGetProductsQuery({
+  const { data, isLoading, error } = useGetProductsQuery({
     pageNumber,
   });
   const [createProduct, { isLoading: loadingCreate }] =

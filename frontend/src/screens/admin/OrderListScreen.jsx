@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Table, Button } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import Loader from "../../components/Loader";
 import Message from "../../components/Message";
 import { useGetOrdersQuery } from "../../slices/ordersApiSlice";
